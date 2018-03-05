@@ -35,7 +35,6 @@ class TrayIcon(Gtk.StatusIcon):
         btn = Gtk.MenuItem(label = "Stop all jobs (stops the queue!)")
         def stopAll(w):
             self.conn.request(QUEUE_BASE_URL+"/stopall", "GET")
-            self.conn.getresponse().read()
         btn.connect("activate", stopAll)
         self.service_menu.append(btn)
 
