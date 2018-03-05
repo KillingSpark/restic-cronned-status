@@ -16,7 +16,7 @@ QUEUE_UPDATE_TIMER = 1 #seconds
 class TrayIcon(Gtk.StatusIcon):
     def __init__(self):
         Gtk.StatusIcon.__init__(self)
-        self.set_from_icon_name('help-about')
+        self.set_from_stock(Gtk.STOCK_FLOPPY)
         self.set_visible(True)
         self.connect("button-press-event", self.on_click)
         self.job_progbars = {}
