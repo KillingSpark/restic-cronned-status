@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -44,11 +46,25 @@ class TrayIcon(Gtk.StatusIcon):
         try:
             (_, content) = self.conn.request(QUEUE_BASE_URL+"/queue", "GET")
             data = json.loads(content.decode("UTF-8"))
+            # delete removed jobs
+            toremove = list()
+            for name in self.job_progbars:
+                found = False
+                for job in data["Jobs"]:
+                    if name == job["JobName"]:
+                        found = True
+                if not found:
+                    toremove.append(name)
+            for name in toremove:
+                self.remove_job_menu_item(name)
+
+            # update progressbars
             for job in data["Jobs"]:
                 name = job["JobName"]
                 if name not in self.job_progbars:
                     self.prepare_new_job_menu_item(name)
                 self.update_progressbar(name, job)
+
         except Exception as e:
             print(e)
 
@@ -86,6 +102,11 @@ class TrayIcon(Gtk.StatusIcon):
             self.job_progbars[name].set_fraction(0)
 
         self.job_progbars[name].set_text(text)
+
+    def remove_job_menu_item(self,name):
+        self.job_menu.remove(self.job_progbars[name].get_parent().get_parent())
+        del self.job_progbars[name]
+
 
     def prepare_new_job_menu_item(self, name):
         self.job_progbars[name] = Gtk.ProgressBar()
