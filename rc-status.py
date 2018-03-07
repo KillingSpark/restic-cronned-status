@@ -116,18 +116,19 @@ class TrayIcon(Gtk.StatusIcon):
         item = Gtk.MenuItem()
         item.add(box)
         submenu = Gtk.Menu()
-        stopItem = Gtk.MenuItem(label="Stop")
-        submenu.append(stopItem)
-        stopItem.name = name
-        def stopJob(item):
-            self.conn.request(QUEUE_BASE_URL+"/stop?name="+item.name, "GET")
-        stopItem.connect("activate",stopJob)
-        restartItem = Gtk.MenuItem(label="Restart")
-        submenu.append(restartItem)
-        restartItem.name = name
-        def restartJob(item):
-            self.conn.request(QUEUE_BASE_URL+"/restart?name="+item.name, "GET")
-        restartItem.connect("activate",restartJob)
+
+        commands = ["Stop", "Restart", "Remove", "Trigger"]
+
+        for command in commands:
+            commItem = Gtk.MenuItem(label=command)
+            submenu.append(commItem)
+            commItem.name = name
+            commItem.cmd = command
+            def cmdFunc(item):
+                self.conn.request(QUEUE_BASE_URL+"/" + item.cmd.lower() + "?name="+item.name, "GET")
+                return True
+            commItem.connect("activate",cmdFunc)
+        
         item.set_submenu(submenu)
         self.job_menu.append(item)
 
